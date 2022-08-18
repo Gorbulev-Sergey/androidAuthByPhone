@@ -1,31 +1,28 @@
 package ru.gorbulevsv.androidauthbyphone;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 
 import java.util.concurrent.TimeUnit;
+import java.util.prefs.Preferences;
 
 public class MainActivity extends AppCompatActivity {
-    private FirebaseAuth mAuth;
+    FirebaseAuth auth;
+    SharedPreferences preferences;
     EditText edtPhone, edtOTP;
     Button verifyOTPBtn, generateOTPBtn;
     String verificationId;
@@ -36,7 +33,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mAuth = FirebaseAuth.getInstance();
+        auth = FirebaseAuth.getInstance();
+        preferences = getSharedPreferences("preferences", MODE_PRIVATE);
+        if (preferences.getString("userPhone", "") != "") {
+            startActivity(new Intent(this, HomeActivity.class));
+        }
 
         edtPhone = findViewById(R.id.idEdtPhoneNumber);
         edtOTP = findViewById(R.id.idEdtOtp);
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
         generateOTPBtn.setOnClickListener(v -> {
             if (TextUtils.isEmpty(edtPhone.getText().toString())) {
-                Toast.makeText(MainActivity.this, "Please enter a valid phone number.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Пожалуйста, введите правильный телефонный номер.", Toast.LENGTH_SHORT).show();
             } else {
                 String phone = edtPhone.getText().toString();
                 sendVerificationCode(phone);
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
         verifyOTPBtn.setOnClickListener(v -> {
             if (TextUtils.isEmpty(edtOTP.getText().toString())) {
-                Toast.makeText(MainActivity.this, "Please enter OTP", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Пожалуйста, введите код из сообщения.", Toast.LENGTH_SHORT).show();
             } else {
                 verifyCode(edtOTP.getText().toString());
             }
@@ -64,9 +65,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void signInWithCredential(PhoneAuthCredential credential) {
-        mAuth.signInWithCredential(credential)
+        auth.signInWithCredential(credential)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
+                        preferences.edit().putString("userPhone", edtPhone.getText().toString()).apply();
                         Intent i = new Intent(MainActivity.this, HomeActivity.class);
                         startActivity(i);
                         finish();
@@ -78,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void sendVerificationCode(String number) {
         PhoneAuthOptions options =
-                PhoneAuthOptions.newBuilder(mAuth)
+                PhoneAuthOptions.newBuilder(auth)
                         .setPhoneNumber(number)            // Phone number to verify
                         .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
                         .setActivity(MainActivity.this)                 // Activity (for callback binding)
