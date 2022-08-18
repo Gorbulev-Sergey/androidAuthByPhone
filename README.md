@@ -1,5 +1,4 @@
-# androidAuthByPhone
-Регистрация в firebase auth через телефон
+# Регистрация в firebase auth через телефон
 
 Для работы регистации через телефон нужно выполнить несколько подготовительных действий. Они описаны 
 <code>[в этой статье](https://www.geeksforgeeks.org/firebase-authentication-with-phone-number-otp-in-android/)</code>.
