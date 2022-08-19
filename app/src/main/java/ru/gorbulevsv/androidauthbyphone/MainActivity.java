@@ -2,12 +2,14 @@ package ru.gorbulevsv.androidauthbyphone;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,8 +50,14 @@ public class MainActivity extends AppCompatActivity {
             if (TextUtils.isEmpty(edtPhone.getText().toString())) {
                 Toast.makeText(MainActivity.this, "Пожалуйста, введите правильный телефонный номер.", Toast.LENGTH_SHORT).show();
             } else {
+                // Вызываем диалоговое окно с прогресс-баром для блокировки возможности повторной отправки пользователем запроса
+                ProgressDialog progressDialog = new ProgressDialog(this);
+                progressDialog.show(this, "Получение кода", "Пожалуйста, дождитесь СМС с кодом!");
+
                 String phone = edtPhone.getText().toString();
                 sendVerificationCode(phone);
+
+                progressDialog.dismiss();
             }
         });
 
