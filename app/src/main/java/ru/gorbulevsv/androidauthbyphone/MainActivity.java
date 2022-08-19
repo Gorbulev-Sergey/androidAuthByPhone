@@ -24,7 +24,6 @@ import java.util.prefs.Preferences;
 
 public class MainActivity extends AppCompatActivity {
     FirebaseAuth auth;
-    SharedPreferences preferences;
     EditText edtPhone, edtOTP;
     Button verifyOTPBtn, generateOTPBtn;
     String verificationId;
@@ -36,8 +35,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         auth = FirebaseAuth.getInstance();
-        preferences = getSharedPreferences("preferences", MODE_PRIVATE);
-        if (preferences.getString("userPhone", "") != "") {
+        if (auth.getCurrentUser() != null) {
+            // Если пользователь уже залогинился в прошлый раз, то мы пропускаем его дальше
             startActivity(new Intent(this, HomeActivity.class));
         }
 
@@ -76,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
         auth.signInWithCredential(credential)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        preferences.edit().putString("userPhone", edtPhone.getText().toString()).apply();
                         Intent i = new Intent(MainActivity.this, HomeActivity.class);
                         startActivity(i);
                         finish();
