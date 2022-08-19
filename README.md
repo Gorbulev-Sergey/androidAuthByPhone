@@ -1,7 +1,7 @@
 # Регистрация в firebase auth через телефон
 
 Для работы регистации через телефон нужно выполнить несколько подготовительных действий. Они описаны 
-<code>[в этой статье](https://www.geeksforgeeks.org/firebase-authentication-with-phone-number-otp-in-android/)</code>.
+[в этой статье](https://www.geeksforgeeks.org/firebase-authentication-with-phone-number-otp-in-android/).
 
 Кроме этого нужно:  
 1. В консоли firebase, к подключенному к firebaseAuth приложению, из которого будут отсылаться смс, добавить SH1 и SH254 отпечатки приложения.
